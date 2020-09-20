@@ -32,6 +32,9 @@ from .dbtypes import Author, Base, Commit, AuthorCommitDetail, Repository, Proje
 _diff_stat_regex = re.compile('^([0-9]+|-)\t([0-9]+|-)\t(.*)$')
 _default_database_url = 'sqlite:///git-hammer.sqlite'
 
+# GIT_AUTHOR_FORMAT = '%aN <%aE>'
+# Ignore email
+GIT_AUTHOR_FORMAT = '%aN'
 
 def _time_to_utc_offset(time):
     utc_time = time.astimezone(datetime.timezone.utc)
@@ -58,7 +61,7 @@ def _print_line_counts(line_counts):
 
 
 def _author_line(commit):
-    return '{} <{}>'.format(commit.author.name, commit.author.email)
+    return ''.join(x if x.isalpha() else ' ' for x in commit.author.name)
 
 
 def _fail_unless_database_exists(engine):
@@ -217,14 +220,16 @@ class Hammer:
     def _add_author_alias_if_needed(self, repository, commit):
         author_line = _author_line(commit)
         if not self._names_to_authors.get(author_line):
-            canonical_name = repository.git_repository.git.show(commit.hexsha, format='%aN <%aE>', no_patch=True)
+            canonical_name = repository.git_repository.git.show(commit.hexsha, format=GIT_AUTHOR_FORMAT, no_patch=True)
             author = self._names_to_authors[canonical_name]
             author.aliases.append(author_line)
             self._names_to_authors[author_line] = author
 
     def _add_canonical_authors(self, repository, session):
-        author_lines = repository.git_repository.git.log(format='%aN <%aE>')
+        author_lines = repository.git_repository.git.log(format=GIT_AUTHOR_FORMAT)
         for author_line in set(author_lines.splitlines()):
+            author_line = ''.join(x if x.isalpha() else ' '
+                                  for x in author_line)
             if not self._names_to_authors.get(author_line):
                 author = Author(canonical_name=author_line, aliases=[])
                 self._names_to_authors[author_line] = author

@@ -91,11 +91,7 @@ class Author(Base):
 
     @property
     def name(self):
-        match = Author._name_regex.match(self.canonical_name)
-        if match:
-            return match.group(1)
-        else:
-            return None
+        return self.canonical_name
 
     def __eq__(self, other):
         return self.canonical_name == other.canonical_name and self.aliases == other.aliases
