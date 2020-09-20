@@ -61,7 +61,7 @@ def _print_line_counts(line_counts):
 
 
 def _author_line(commit):
-    return commit.author.name
+    return ''.join(x if x.isalpha() else ' ' for x in commit.author.name)
 
 
 def _fail_unless_database_exists(engine):
@@ -228,6 +228,8 @@ class Hammer:
     def _add_canonical_authors(self, repository, session):
         author_lines = repository.git_repository.git.log(format=GIT_AUTHOR_FORMAT)
         for author_line in set(author_lines.splitlines()):
+            author_line = ''.join(x if x.isalpha() else ' '
+                                  for x in author_line)
             if not self._names_to_authors.get(author_line):
                 author = Author(canonical_name=author_line, aliases=[])
                 self._names_to_authors[author_line] = author
