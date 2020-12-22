@@ -32,6 +32,7 @@ def _plot_totals(hammer, counts_property):
     figure = mpplot.figure()
     plot = figure.add_subplot(111)
     plot.plot(date_array, line_count_array, ls='-', marker='')
+    plot.grid(True)
     figure.autofmt_xdate(rotation=45)
     figure.tight_layout()
     return figure
@@ -59,6 +60,7 @@ def _plot_totals_per_author(hammer, counts_property, min_count_per_author=0):
     figure.subplots_adjust(left=0.08, right=0.75, top=0.95, bottom=0.05)
     plot = figure.add_subplot(111)
     plot.stackplot(date_array, count_array, labels=author_labels)
+    plot.grid(True)
     handles, labels = plot.get_legend_handles_labels()
     plot.legend(handles[:25], labels[:25], bbox_to_anchor=(1.0, 0.5), loc='center left')
     figure.autofmt_xdate(rotation=45)
@@ -87,6 +89,7 @@ def commits_per_hour(hammer):
         count_array[commit.commit_time_tz().hour] += 1
     figure = mpplot.figure()
     plot = figure.add_subplot(111)
+    plot.grid(True)
     plot.bar(range(len(count_array)), count_array)
     figure.tight_layout()
     return figure
@@ -99,6 +102,7 @@ def commits_per_weekday(hammer):
     figure = mpplot.figure()
     plot = figure.add_subplot(111)
     plot.bar(range(len(count_array)), count_array)
+    plot.grid(True)
     figure.tight_layout()
     mpplot.xticks(range(len(count_array)),
                   ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])
